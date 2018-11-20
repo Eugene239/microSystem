@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+parser:
+  cainiao:
+    name: Global Cainiao
+    code: 0
+    url: https://global.cainiao.com/
+    enabled: true
+  pochta:
+    name: Pochta.ru
+    code: 1
+    url: https://www.pochta.ru/
+    enabled: true
+  17track:
+    name: 17TRACK
+    code: 2
+    url:
+
