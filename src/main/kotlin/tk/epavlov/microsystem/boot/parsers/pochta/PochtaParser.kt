@@ -20,6 +20,7 @@ class PochtaParser : Parser, CommonInterface{
     override suspend fun getTrack(trackId: String): TrackData? {
         val spend = System.currentTimeMillis()
         val response = getRetrofit().getPochtaTrack(trackId,System.currentTimeMillis()).await()
+        log.info("response: $response")
         return if (response.list == null){
             null
         } else{
@@ -45,9 +46,6 @@ class PochtaParser : Parser, CommonInterface{
 
     override fun isEnabled(): Boolean = config.enabled
 
-    override suspend fun getTrackAsync(trackId: String): Deferred<TrackData?> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     private fun getRetrofit(): RetrofitPochta{
         return  getRetrofit(config.url, RetrofitPochta::class.java)

@@ -27,13 +27,12 @@ class CainiaoParser : Parser, CommonInterface {
         const val TIME = "time"
         const val DATE_FORMAT = "yyyy-MM-dd HH:mm:SS"
         const val EMPTY = "RESULT_EMPTY"
+        const val LOGITIC_ALERT = ",logisticsAlert"
         val formatter = SimpleDateFormat(DATE_FORMAT)
     }
 
     @Autowired
     private lateinit var config: CainiaoConfig
-
-    override suspend fun getTrackAsync(trackId: String): Deferred<TrackData?> = GlobalScope.async { getTrack(trackId) }
 
     //todo change suspend to blocking
     override suspend fun getTrack(trackId: String): TrackData? {
@@ -50,23 +49,9 @@ class CainiaoParser : Parser, CommonInterface {
             if (raw != null) {
                 log.debug("[BEFORE] $raw")
                 if (raw.contains(EMPTY)) return@safe
-
-                raw = raw
-                        .replace(PREFIX, "")
-                        .replace(POSTFIX, "")
-                        .replace(QUOT, "")
-                        .split(LATEST_INFO)[1]
-                        .split(MAILNO)[0]
-
-                        .replace("{", "{\"")
-                        .replace("$DESC:", "$DESC\":\"")
-                        .replace(",$STATUS:", "\",\"$STATUS\":\"")
-                        .replace(",$TIME:", "\",\"$TIME\":\"")
-                        .replace(",$TIMEZONE:", "\",$TIMEZONE\":\"")
-                        .replace("}", "\"}")
-                        .trim()
-
-                log.debug("[AFTER] $raw")
+                log.info(raw)
+                raw = replace(raw)
+                log.info("[AFTER] $raw")
                 val entity = gson.fromJson(raw, CainiaoEntity::class.java)
                 val time = LocalDateTime.ofInstant(formatter.parse(entity.time).toInstant(), TimeZone.getDefault().toZoneId())
                 log.debug(entity.toString())
@@ -85,6 +70,23 @@ class CainiaoParser : Parser, CommonInterface {
         return response
     }
 
+    public fun replace(rawText: String): String {
+        return rawText
+                .replace(PREFIX, "")
+                .replace(POSTFIX, "")
+                .replace(QUOT, "")
+               // .split(LATEST_INFO)[1]
+               // .split(MAILNO)[0]
+               // .split(LOGITIC_ALERT)[0]
+
+//                .replace("{", "{\"")
+//                .replace("$DESC:", "$DESC\":\"")
+//                .replace(",$STATUS:", "\",\"$STATUS\":\"")
+//                .replace(",$TIME:", "\",\"$TIME\":\"")
+//                .replace(",$TIMEZONE:", "\",$TIMEZONE\":\"")
+//                .replace("}", "\"}")
+                .trim()
+    }
 
     override fun getName(): String = config.name
     override fun isEnabled(): Boolean = config.enabled

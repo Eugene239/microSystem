@@ -16,21 +16,40 @@ import tk.epavlov.microsystem.boot.parsers.track17.request.Track17Request
 import tk.epavlov.microsystem.boot.parsers.track17.response.Track
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.random.Random
 
 
 @Service
 class Track17Parser : Parser, CommonInterface {
+    companion object {
+        val SET_COOKIE = "set-cookie"
+        val COOKIE ="cookie"
+        val cookieHeader = "_yq_bid=G-FCE87E98A3CA7E51; __cfduid=d7c4920a5134b643a2cd1b19e620bbc751543611461; v5_TranslateLang=ru; Last-Event-ID="
+    }
     private val random = Random(System.currentTimeMillis())
     @Autowired
     lateinit var config: Track17Config
+
+    private val additionalHeaders = HashMap<String,String>()
 
     override suspend fun getTrack(trackId: String): TrackData? {
         log.debug("getting track: $trackId")
         val spend = System.currentTimeMillis()
         val request = Track17Request("", arrayListOf(Data(trackId)))
         log.debug("request: ${gson.toJson(request)}")
-        var response = getRetrofit().getResponse(request).await()
+        var lastevenetId = ""
+        while (lastevenetId.length < 118){
+            lastevenetId+=  UUID.randomUUID().toString().replace("-","")
+        }
+        lastevenetId = lastevenetId.substring(0,118)
+        println(lastevenetId)
+        additionalHeaders[COOKIE] = cookieHeader+ lastevenetId
+        var response = getRetrofit().getResponse(request, additionalHeaders).await()
+        val cookies = response.headers().get(SET_COOKIE)
+//        cookies?.let {cs->
+//            additionalHeaders.put(COOKIE, cs)
+//        }
         response.info()
         return null
     }
@@ -42,7 +61,8 @@ class Track17Parser : Parser, CommonInterface {
         log.debug("request: ${gson.toJson(request)}")
         var response = getRetrofit().get17Track(request).await()
         log.debug("response: $response")
-        if (response.dat.isEmpty()) {
+        if (response.ret!=1) {
+            log.error("error request $request\n $response")
             return null
         }
         var track17 = response.dat[0].track
@@ -78,10 +98,6 @@ class Track17Parser : Parser, CommonInterface {
 
     override fun isEnabled(): Boolean {
         return config.enabled
-    }
-
-    override suspend fun getTrackAsync(trackId: String): Deferred<TrackData?> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     private fun getRetrofit(): Retrofit17Track {

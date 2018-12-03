@@ -28,7 +28,7 @@ class Track17Test{
 
     val logger  = LoggerFactory.getLogger(this.javaClass)
 
-    val track ="RP052760925CN"//"CB039612729RU"//"12312sdfwe324werfw"//"RP052760925CN"
+    val track = listOf("RP052760925CN","CB039612729RU")//"CB039612729RU"//"12312sdfwe324werfw"//"RP052760925CN"
 
     @Before
     fun setupLog(){
@@ -38,8 +38,10 @@ class Track17Test{
     @Test
     fun get() {
         runBlocking {
-            val track= parser.getTrack(track)
-            print("\nfound track: $track\n\n")
+            var trackData= parser.getTrack(track[1])
+            print("\nfound track: $trackData\n\n")
+            trackData= parser.getTrack(track[1])
+            print("\nfound track: $trackData\n\n")
         }
     }
 

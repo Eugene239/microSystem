@@ -7,7 +7,7 @@ import retrofit2.http.*
 import tk.epavlov.microsystem.boot.parsers.track17.request.Track17Request
 import tk.epavlov.microsystem.boot.parsers.track17.response.Track17Response
 
-interface Retrofit17Track{
+interface Retrofit17Track {
 
     @Headers(
             "accept: application/json, text/javascript, */*; q=0.01",
@@ -25,7 +25,7 @@ interface Retrofit17Track{
             "x-requested-with: XMLHttpRequest"
     )
     @POST("restapi/track")
-    fun get17Track(@Body request:Track17Request): Deferred<Track17Response>
+    fun get17Track(@Body request: Track17Request): Deferred<Track17Response>
 
     @Headers(
             "accept: application/json, text/javascript, */*; q=0.01",
@@ -42,7 +42,7 @@ interface Retrofit17Track{
             "x-requested-with: XMLHttpRequest"
     )
     @POST("restapi/track")
-    fun getResponse(@Body request:Track17Request): Deferred<Response<Track17Response>>
+    fun getResponse(@Body request: Track17Request, @HeaderMap headerMap: Map<String,String>?): Deferred<Response<Track17Response>>
 
 
 }
