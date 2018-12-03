@@ -28,7 +28,7 @@ class Track17Test{
 
     val logger  = LoggerFactory.getLogger(this.javaClass)
 
-    val track ="RP052760925CN"//"12312sdfwe324werfw"//"RP052760925CN"
+    val track ="RP052760925CN"//"CB039612729RU"//"12312sdfwe324werfw"//"RP052760925CN"
 
     @Before
     fun setupLog(){

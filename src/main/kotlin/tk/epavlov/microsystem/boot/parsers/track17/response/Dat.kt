@@ -8,7 +8,7 @@ data class Dat(
         @SerializedName("no")
         val no: String,
         @SerializedName("track")
-        val track: Track,
+        val track: Track?,
         @SerializedName("yt")
         val yt: Any
 )
