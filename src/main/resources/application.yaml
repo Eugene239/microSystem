@@ -15,5 +15,7 @@ parser:
   17track:
     name: 17TRACK
     code: 2
-    url:
+    url: https://t.17track.net/
+    #url: http://localhost:8080/
+    enabled: true
 
