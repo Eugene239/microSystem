@@ -21,7 +21,7 @@ import kotlin.random.Random
 
 
 @Service
-class Track17Parser : Parser, CommonInterface {
+class Track17Parser : Parser {
     companion object {
         val SET_COOKIE = "set-cookie"
         val COOKIE ="cookie"

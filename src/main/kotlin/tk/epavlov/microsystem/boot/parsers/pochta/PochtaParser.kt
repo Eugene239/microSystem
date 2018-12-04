@@ -1,17 +1,14 @@
 package tk.epavlov.microsystem.boot.parsers.pochta
 
-import kotlinx.coroutines.Deferred
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import tk.epavlov.microsystem.boot.common.CommonInterface
 import tk.epavlov.microsystem.boot.common.TrackData
 import tk.epavlov.microsystem.boot.parsers.Parser
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
-class PochtaParser : Parser, CommonInterface{
+class PochtaParser : Parser{
 
     @Autowired
     lateinit var config: PochtaConfig

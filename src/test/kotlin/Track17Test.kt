@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import tk.epavlov.microsystem.boot.Application
+import tk.epavlov.microsystem.boot.common.CommonInterface
 import tk.epavlov.microsystem.boot.parsers.track17.Track17Config
 import tk.epavlov.microsystem.boot.parsers.track17.Track17Parser
 
@@ -20,28 +21,27 @@ import tk.epavlov.microsystem.boot.parsers.track17.Track17Parser
 @TestPropertySource(locations=["classpath:application.yaml"],
         properties = ["logging.level.tk.epavlov.microsystem:DEBUG"])
 
-class Track17Test{
+class Track17Test : CommonInterface{
     @Autowired
     lateinit var parser : Track17Parser
     @Autowired
     lateinit var config: Track17Config
 
-    val logger  = LoggerFactory.getLogger(this.javaClass)
 
     val track = listOf("RP052760925CN","CB039612729RU")//"CB039612729RU"//"12312sdfwe324werfw"//"RP052760925CN"
 
     @Before
     fun setupLog(){
-        logger.info(config.toString())
+        log.info(config.toString())
     }
 
     @Test
     fun get() {
         runBlocking {
             var trackData= parser.getTrack(track[1])
-            print("\nfound track: $trackData\n\n")
+            log.info("found track: $trackData")
             trackData= parser.getTrack(track[1])
-            print("\nfound track: $trackData\n\n")
+            log.info("found track: $trackData")
         }
     }
 

@@ -1,40 +1,27 @@
 package tk.epavlov.microsystem.boot.parsers.cainiao
 
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import tk.epavlov.microsystem.boot.common.CommonInterface
 import tk.epavlov.microsystem.boot.common.TrackData
 import tk.epavlov.microsystem.boot.common.safe
 import tk.epavlov.microsystem.boot.parsers.Parser
-import java.text.SimpleDateFormat
+import tk.epavlov.microsystem.boot.parsers.cainiao.entity.CainiaoEntity
 import java.time.LocalDateTime
-import java.util.*
+import java.time.format.DateTimeFormatter
 
 @Service
-class CainiaoParser : Parser, CommonInterface {
+class CainiaoParser : Parser {
     companion object {
         const val PREFIX = "<textarea style=\"display: none;\" id=\"waybill_list_val_box\">"
         const val POSTFIX = "</textarea>"
         const val QUOT = "&quot;"
-        const val LATEST_INFO = "latestTrackingInfo:"
-        const val MAILNO = ",mailNo"
-        const val TIMEZONE = ",timeZone:"
-        const val DESC = "desc"
-        const val STATUS = "status"
-        const val TIME = "time"
-        const val DATE_FORMAT = "yyyy-MM-dd HH:mm:SS"
+        const val DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
         const val EMPTY = "RESULT_EMPTY"
-        const val LOGITIC_ALERT = ",logisticsAlert"
-        val formatter = SimpleDateFormat(DATE_FORMAT)
     }
 
     @Autowired
     private lateinit var config: CainiaoConfig
 
-    //todo change suspend to blocking
     override suspend fun getTrack(trackId: String): TrackData? {
         val start = System.currentTimeMillis()
         var response: TrackData? = null
@@ -46,45 +33,36 @@ class CainiaoParser : Parser, CommonInterface {
 
         safe {
             var raw = body.splitToSequence("\n").filter { it.contains("waybill_list_val_box") }.firstOrNull()
-            if (raw != null) {
-                log.debug("[BEFORE] $raw")
-                if (raw.contains(EMPTY)) return@safe
-                log.info(raw)
+            if (!raw.isNullOrBlank()) {
+                log.debug("RAW: $raw")
                 raw = replace(raw)
-                log.info("[AFTER] $raw")
+                log.debug("REPLACE: $raw")
                 val entity = gson.fromJson(raw, CainiaoEntity::class.java)
-                val time = LocalDateTime.ofInstant(formatter.parse(entity.time).toInstant(), TimeZone.getDefault().toZoneId())
-                log.debug(entity.toString())
+                if (entity.data!=null && entity.data.isNotEmpty()){
+                    entity.data[0].latestTrackingInfo?.let {
+                        response = TrackData(
+                                id = trackId,
+                                parser = getName(),
+                                parserCode = getCode(),
+                                status = it.status?:"",
+                                text = it.desc?:"",
+                                lastCheck = LocalDateTime.now(),
+                                time = LocalDateTime.parse(it.time, DateTimeFormatter.ofPattern(DATE_FORMAT)),
+                                spendTime = System.currentTimeMillis()- start)
+                    }
 
-                response = TrackData(trackId,
-                        getName(),
-                        getCode(),
-                        entity.status ?: "",
-                        entity.desc ?: "",
-                        time,
-                        LocalDateTime.now(),
-                        System.currentTimeMillis() - start)
+                }
             }
         }
-        log.info("[RESPONSE] $response")
+        log.info("[RESPONSE] $response TIMESPEND: ${System.currentTimeMillis() - start}")
         return response
     }
 
-    public fun replace(rawText: String): String {
+    fun replace(rawText: String): String {
         return rawText
                 .replace(PREFIX, "")
                 .replace(POSTFIX, "")
-                .replace(QUOT, "")
-               // .split(LATEST_INFO)[1]
-               // .split(MAILNO)[0]
-               // .split(LOGITIC_ALERT)[0]
-
-//                .replace("{", "{\"")
-//                .replace("$DESC:", "$DESC\":\"")
-//                .replace(",$STATUS:", "\",\"$STATUS\":\"")
-//                .replace(",$TIME:", "\",\"$TIME\":\"")
-//                .replace(",$TIMEZONE:", "\",$TIMEZONE\":\"")
-//                .replace("}", "\"}")
+                .replace(QUOT, "\"")
                 .trim()
     }
 

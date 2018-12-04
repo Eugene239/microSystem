@@ -10,8 +10,10 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import tk.epavlov.microsystem.boot.Application
+import tk.epavlov.microsystem.boot.common.CommonInterface
 import tk.epavlov.microsystem.boot.parsers.pochta.PochtaConfig
 import tk.epavlov.microsystem.boot.parsers.pochta.PochtaParser
+import java.util.*
 
 @RunWith(SpringRunner::class)
 @EnableConfigurationProperties
@@ -20,26 +22,33 @@ import tk.epavlov.microsystem.boot.parsers.pochta.PochtaParser
 @TestPropertySource(locations=["classpath:application.yaml"],
         properties = ["logging.level.tk.epavlov.microsystem:DEBUG"])
 
-class PochtaTest{
+class PochtaTest : CommonInterface{
     @Autowired
     lateinit var parser : PochtaParser
     @Autowired
     lateinit var config: PochtaConfig
 
-    val logger  = LoggerFactory.getLogger(this.javaClass)
 
     val track ="RP052760925CN"//"12312sdfwe324werfw"//"RP052760925CN"
-
+    val errorTrack = UUID.randomUUID().toString().replace("-","")
     @Before
     fun setupLog(){
-        logger.info(config.toString())
+        log.info(config.toString())
     }
 
     @Test
     fun get() {
         runBlocking {
             val track= parser.getTrack(track)
-            print("\nfound track: $track\n\n")
+            log.info("found track: $track")
+        }
+    }
+    @Test
+    fun errorTrack() {
+        runBlocking {
+            val track= parser.getTrack(errorTrack)
+            log.info("found track: $track")
+            assert(track ==null)
         }
     }
 
