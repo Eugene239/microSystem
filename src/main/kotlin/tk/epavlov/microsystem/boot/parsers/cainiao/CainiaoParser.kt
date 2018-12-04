@@ -36,7 +36,7 @@ class CainiaoParser : Parser {
             if (!raw.isNullOrBlank()) {
                 log.debug("RAW: $raw")
                 raw = replace(raw)
-                log.debug("REPLACE: $raw")
+                log.info("replace: $raw")
                 val entity = gson.fromJson(raw, CainiaoEntity::class.java)
                 if (entity.data!=null && entity.data.isNotEmpty()){
                     entity.data[0].latestTrackingInfo?.let {

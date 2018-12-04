@@ -17,7 +17,7 @@ class PochtaParser : Parser{
     override suspend fun getTrack(trackId: String): TrackData? {
         val spend = System.currentTimeMillis()
         val response = getRetrofit().getPochtaTrack(trackId,System.currentTimeMillis()).await()
-        log.info("response: $response")
+        log.info("[RESPONSE]: $response")
         return if (response.list == null){
             null
         } else{
