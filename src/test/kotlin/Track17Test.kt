@@ -2,7 +2,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,7 +17,7 @@ import tk.epavlov.microsystem.boot.parsers.track17.Track17Parser
 @EnableConfigurationProperties
 @ContextConfiguration(classes = [Application::class])
 @SpringBootTest
-@TestPropertySource(locations=["classpath:application.yaml"],
+@TestPropertySource(locations=["classpath:application.yml"],
         properties = ["logging.level.tk.epavlov.microsystem:DEBUG"])
 
 class Track17Test : CommonInterface{

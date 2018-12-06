@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource
 
 @ConfigurationProperties(prefix = "parser.17track")
-@PropertySource( "classpath:application.yaml")
+@PropertySource( "classpath:application.yml")
 @Configuration
 open class Track17Config {
     var name: String=""

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource
 
 
 @ConfigurationProperties(prefix = "parser.cainiao")
-@PropertySource( "classpath:application.yaml")
+@PropertySource( "classpath:application.yml")
 @Configuration
 open class CainiaoConfig {
     var name: String=""

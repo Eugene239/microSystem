@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.PropertySource
 
 @ConfigurationProperties(prefix = "parser.pochta")
-@PropertySource( "classpath:application.yaml")
+@PropertySource( "classpath:application.yml")
 @Configuration
 open class PochtaConfig {
     var name: String=""
