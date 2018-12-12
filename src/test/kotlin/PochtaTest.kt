@@ -28,7 +28,7 @@ class PochtaTest : CommonInterface{
     lateinit var config: PochtaConfig
 
 
-    val track ="RP052760925CN"//"12312sdfwe324werfw"//"RP052760925CN"
+    val track ="RB672036540SG"//"12312sdfwe324werfw"//"RP052760925CN"
     val errorTrack = UUID.randomUUID().toString().replace("-","")
     @Before
     fun setupLog(){

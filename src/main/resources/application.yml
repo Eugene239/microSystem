@@ -18,4 +18,7 @@ parser:
     url: https://t.17track.net/
     #url: http://localhost:8080/
     enabled: false
-
+logging:
+  file: finder.log
+  level:
+    tk.epavlov: info

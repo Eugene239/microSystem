@@ -27,7 +27,7 @@ class CainiaoTest : CommonInterface{
     lateinit var config: CainiaoConfig
 
 
-    val track = "RP052760925CN"
+    val track = "RB672036540SG"//"RP052760925CN"
     val errorTrack = "oEIWOIWe213213"
 
     @Before
