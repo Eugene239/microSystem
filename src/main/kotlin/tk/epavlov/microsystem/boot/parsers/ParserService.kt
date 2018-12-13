@@ -4,11 +4,14 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import tk.epavlov.microsystem.boot.common.CommonInterface
 import tk.epavlov.microsystem.boot.common.TrackData
 import java.util.*
+import java.util.regex.Pattern
 import javax.annotation.PostConstruct
 
 @Service
@@ -18,9 +21,16 @@ class ParserService : CommonInterface {
 
     private val parsers: MutableList<Parser> = ArrayList()
 
+    @Value("\${parser.regexp}")
+    lateinit var regexp: String
+
+    private lateinit var pattern: Pattern
+
+
     @PostConstruct
     fun init() {
         val parsersMap = context.getBeansOfType(Parser::class.java)
+        pattern = Pattern.compile(regexp)
         parsersMap.forEach { t, u ->
             log.info("$t: enabled = ${u.isEnabled()}")
             if (u.isEnabled()) {
@@ -29,14 +39,20 @@ class ParserService : CommonInterface {
         }
     }
 
+    @Cacheable(value = ["trackInfo"])
     fun getTrackInfo(trackId: String): List<TrackData> {
-        log.info("get $trackId")
+        log.debug("get $trackId")
+        if (!pattern.matcher(trackId).matches()) {
+            log.warn("NOT MATCHED REGEXP: $regexp")
+            return emptyList()
+        }
+
         return runBlocking {
             val jobs = ArrayList<Deferred<TrackData?>>()
             parsers.forEach {
                 jobs.add(it.getTrackAsync(trackId))
             }
-            jobs.awaitAll().filterNotNull()
+            jobs.awaitAll().filterNotNull().sortedBy { it.spendTime }
         }
     }
 }

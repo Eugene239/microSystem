@@ -2,6 +2,7 @@ server:
   port: 8080
 
 parser:
+  regexp: .*[0-9]{5,}.*
   cainiao:
     name: Global Cainiao
     code: 0

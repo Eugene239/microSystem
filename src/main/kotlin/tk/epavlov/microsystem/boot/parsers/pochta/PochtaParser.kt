@@ -13,25 +13,24 @@ class PochtaParser : Parser {
     @Autowired
     lateinit var config: PochtaConfig
 
-    //todo change suspend to blocking
     override suspend fun getTrack(trackId: String): TrackData? {
         val spend = System.currentTimeMillis()
         val response = getRetrofit().getPochtaTrack(trackId, System.currentTimeMillis()).await()
-        log.info("[RESPONSE]: $response")
-        if (response.list == null) {
-            return null
+        log.info("trackPochta: $response")
+        val track = if (response.list == null) {
+            null
         } else {
             try {
                 with(response) {
                     val item = this.list?.get(0)
                     val itemHistory = item?.trackingItem?.trackingHistoryItemList?.get(0)
-                    return TrackData(
+                    TrackData(
                             item?.trackingItem?.barcode ?: "",
                             getName(),
                             getCode(),
                             item?.trackingItem?.globalStatus ?: "",
                             itemHistory?.humanStatus ?: "",
-                            LocalDateTime.parse(itemHistory?.date?:"", DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                            LocalDateTime.parse(itemHistory?.date ?: "", DateTimeFormatter.ISO_OFFSET_DATE_TIME),
                             LocalDateTime.now(),
                             System.currentTimeMillis() - spend)
                 }
@@ -41,6 +40,8 @@ class PochtaParser : Parser {
                 return null
             }
         }
+        log.info("[RESPONSE] $track")
+        return track
     }
 
     override fun getName() = config.name

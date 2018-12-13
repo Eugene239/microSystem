@@ -3,7 +3,6 @@ package tk.epavlov.microsystem.boot.parsers.cainiao
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import tk.epavlov.microsystem.boot.common.TrackData
-import tk.epavlov.microsystem.boot.common.safe
 import tk.epavlov.microsystem.boot.parsers.Parser
 import tk.epavlov.microsystem.boot.parsers.cainiao.entity.CainiaoEntity
 import java.time.LocalDateTime
@@ -31,12 +30,13 @@ class CainiaoParser : Parser {
                 .getCainiao(trackId)
                 .await().string()
 
-        safe {
-            var raw = body.splitToSequence("\n").filter { it.contains("waybill_list_val_box") }.firstOrNull()
-            if (!raw.isNullOrBlank()) {
+        var raw=""
+        try {
+            raw = body.splitToSequence("\n").filter { it.contains("waybill_list_val_box") }.firstOrNull()?:""
+            if (!raw.isBlank()) {
                 log.debug("RAW: $raw")
                 raw = replace(raw)
-                log.info("replace: $raw")
+                log.info("trackCainiao: $raw")
                 val entity = gson.fromJson(raw, CainiaoEntity::class.java)
                 if (entity.data!=null && entity.data.isNotEmpty()){
                     entity.data[0].latestTrackingInfo?.let {
@@ -53,6 +53,9 @@ class CainiaoParser : Parser {
 
                 }
             }
+        } catch (e: Exception){
+            log.error("Parser=${getName()} raw=$raw  trackId=$trackId ERROR: $e")
+            e.printStackTrace()
         }
         log.info("[RESPONSE] $response TIMESPEND: ${System.currentTimeMillis() - start}")
         return response
