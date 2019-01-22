@@ -17,12 +17,12 @@ import tk.epavlov.microsystem.boot.parsers.cainiao.CainiaoParser
 @EnableConfigurationProperties
 @ContextConfiguration(classes = [Application::class])
 @SpringBootTest
-@TestPropertySource(locations=["classpath:application.yml"],
+@TestPropertySource(locations = ["classpath:application.yml"],
         properties = ["logging.level.tk.epavlov.microsystem:DEBUG"])
 
-class CainiaoTest : CommonInterface{
+class CainiaoTest : CommonInterface {
     @Autowired
-    lateinit var parser : CainiaoParser
+    lateinit var parser: CainiaoParser
     @Autowired
     lateinit var config: CainiaoConfig
 
@@ -31,23 +31,24 @@ class CainiaoTest : CommonInterface{
     val errorTrack = "oEIWOIWe213213"
 
     @Before
-    fun setupLog(){
+    fun setupLog() {
         log.info(config.toString())
     }
 
     @Test
     fun get() {
         runBlocking {
-            val track= parser.getTrack(track)
+            val track = parser.getTrack(track)
             log.info(track.toString())
         }
     }
+
     @Test
-    fun testNull(){
+    fun testNull() {
         runBlocking {
             val track = parser.getTrack(errorTrack)
             log.info(track.toString())
-            assert(track==null)
+            assert(track == null)
         }
     }
 }
